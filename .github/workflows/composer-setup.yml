@@ -1,0 +1,33 @@
+name: Install Composer Dependencies
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  install-dependencies:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Check if Composer is installed
+      run: composer --version
+
+    - name: Cache Composer dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.composer/cache/files
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-
+
+    - name: Install Composer dependencies
+      run: composer install --no-progress --no-suggest --prefer-dist
+
+    - name: Require AWS SDK for PHP
+      run: composer require aws/aws-sdk-php
+
+    - name: Verify Installation
+      run: composer show aws/aws-sdk-php
