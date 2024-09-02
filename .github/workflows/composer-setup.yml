@@ -16,4 +16,3 @@ jobs:
     - name: Remove vendor directory and composer.lock file
       run: |
         rm -rf vendor
-        rm composer.lock
