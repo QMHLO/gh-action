@@ -33,11 +33,11 @@ jobs:
         composer require aws/aws-sdk-php --ignore-platform-reqs
 
     - name: Commit vendor folder
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git config --global user.email "htetlinoo@qualymm.com"
         git config --global user.name "QMHLO"
         git add vendor
         git commit -m "Add vendor folder"
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/QMHLO/gh-action.git
