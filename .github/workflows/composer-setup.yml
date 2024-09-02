@@ -32,6 +32,14 @@ jobs:
         composer install --ignore-platform-reqs
         composer require aws/aws-sdk-php --ignore-platform-reqs
 
+    - name: List vendor directory
+      run: |
+        ls -R vendor
+
+    - name: Display platform_check.php file
+      run: |
+        cat vendor/composer/platform_check.php
+
     - name: Verify Installation
       run: |
         composer show aws/aws-sdk-php
