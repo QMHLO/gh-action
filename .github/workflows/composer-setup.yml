@@ -43,10 +43,13 @@ jobs:
       run: |
         composer show aws/aws-sdk-php
 
-    - name: Commit and Push Changes
-      run: |
-        git add composer.lock
-        git commit -m "Update composer.lock"
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        - name: Commit and Push Changes
+        run: |
+          git config --global user.email "htetlinoo@qualy.com"
+          git config --global user.name "QMHLO"
+          git add composer.lock
+          git commit -m "Update composer.lock"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
