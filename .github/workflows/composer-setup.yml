@@ -35,4 +35,4 @@ jobs:
         git commit -m "Remove vendor and composer.lock, re-install dependencies"
         git push
       env:
-        GITHUB_TOKEN: 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
+        GITHUB_TOKEN: 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
