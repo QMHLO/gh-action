@@ -1,5 +1,6 @@
 {
     "require": {
-        "aws/aws-sdk-php": "^3.321"
+        "php": "^7.4",  
+        "aws/aws-sdk-php": "^3.0" 
     }
 }
