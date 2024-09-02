@@ -1,4 +1,4 @@
-name: Delete Composer Files
+name: Check Vendor Directory
 
 on:
   push:
@@ -6,13 +6,19 @@ on:
       - develop-aws
 
 jobs:
-  clean:
+  check:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Remove vendor directory and composer.lock file
+    - name: List directory contents
       run: |
-        rm -rf vendor
+        echo "Checking for vendor directory..."
+        if [ -d "vendor" ]; then
+          echo "Vendor directory exists."
+          ls -l vendor
+        else
+          echo "Vendor directory does not exist."
+        fi
