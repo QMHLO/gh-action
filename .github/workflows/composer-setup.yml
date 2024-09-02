@@ -34,7 +34,8 @@ jobs:
 
     - name: List vendor directory
       run: |
-        ls -R vendor
+        cd vendor
+        ls -R
 
     - name: Display platform_check.php file
       run: |
