@@ -27,10 +27,12 @@ jobs:
         composer config platform.php 7.4
         composer install --ignore-platform-reqs
 
-    - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v3
-      with:
-        title: "Update Composer Dependencies"
-        body: "This pull request updates the composer dependencies and includes the vendor directory."
-        base: develop-aws
-        branch: update-composer-deps
+    - name: Commit and Push Changes
+      run: |
+        git config --global user.email "htetlinoo@qualymm.com"
+        git config --global user.name "QMHLO"
+        git add vendor composer.lock
+        git commit -m "Remove vendor and composer.lock, re-install dependencies"
+        git push
+      env:
+        GITHUB_TOKEN: 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
