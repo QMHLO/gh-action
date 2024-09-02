@@ -34,5 +34,4 @@ jobs:
         git add vendor composer.lock
         git commit -m "Remove vendor and composer.lock, re-install dependencies"
         git push
-      env:
-        GITHUB_TOKEN: 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
+     
