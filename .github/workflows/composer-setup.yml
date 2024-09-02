@@ -1,4 +1,4 @@
-name: Composer Setup
+name: Clean Composer and Packages
 
 on:
   push:
@@ -6,38 +6,38 @@ on:
       - develop-aws
 
 jobs:
-  setup:
+  cleanup:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '7.4'
-
-    - name: Install Composer
+    - name: Remove vendor directory
       run: |
-        curl -sS https://getcomposer.org/installer | php
-        sudo mv composer.phar /usr/local/bin/composer
+        if [ -d "vendor" ]; then
+          echo "Removing vendor directory"
+          rm -rf vendor
+        else
+          echo "Vendor directory does not exist"
+        fi
 
-    - name: Remove composer.lock and vendor directory
+    - name: Remove Composer-related files
       run: |
-        rm -rf vendor composer.lock
+        if [ -f "composer.json" ]; then
+          echo "Removing composer.json file"
+          rm composer.json
+        else
+          echo "composer.json file does not exist"
+        fi
+        if [ -f "composer.lock" ]; then
+          echo "Removing composer.lock file"
+          rm composer.lock
+        else
+          echo "composer.lock file does not exist"
+        fi
 
-    - name: Install Composer dependencies (ignore platform requirements)
+    - name: List remaining files and directories
       run: |
-        composer install --ignore-platform-reqs
-        composer require aws/aws-sdk-php --ignore-platform-reqs
-
-    - name: Commit vendor folder
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        git config --global user.email "htetlinoo@qualymm.com"
-        git config --global user.name "QMHLO"
-        git add vendor
-        git commit -m "Add vendor folder"
-        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/QMHLO/gh-action.git
+        echo "Remaining files and directories:"
+        ls -al
