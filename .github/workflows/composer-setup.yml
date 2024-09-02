@@ -1,4 +1,4 @@
-name: Composer Setup
+name: Update Composer
 
 on:
   push:
@@ -6,42 +6,33 @@ on:
       - develop-aws
 
 jobs:
-  setup:
+  update-composer:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '7.4'
+    - name: Remove composer.lock and vendor directory
+      run: |
+        rm -rf vendor composer.lock
 
     - name: Install Composer
       run: |
         curl -sS https://getcomposer.org/installer | php
         sudo mv composer.phar /usr/local/bin/composer
 
-    - name: Remove composer.lock and vendor directory
-      run: |
-        rm -rf vendor composer.lock
-
-    - name: Clear Composer Cache
-      run: |
-        composer clear-cache
-
-    - name: Install Composer dependencies (ignore platform requirements)
+    - name: Install Dependencies
       run: |
         composer config platform.php 7.4
         composer install --ignore-platform-reqs
 
-    - name: Verify Installation
+    - name: Commit and Push Changes
       run: |
-        composer show aws/aws-sdk-php
-
-
-    - name: List Remaining Files
-      run: |
-        echo "Remaining files and directories:"
-        ls -al
+        git config --global user.email "htetlinoo@qualymm.com"
+        git config --global user.name "QMHLO"
+        git add vendor composer.lock
+        git commit -m "Remove vendor and composer.lock, re-install dependencies"
+        git push
+      env:
+        GITHUB_TOKEN: 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
