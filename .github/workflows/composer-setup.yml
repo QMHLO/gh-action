@@ -1,4 +1,4 @@
-name: Composer Setup
+name: Delete Composer Files
 
 on:
   push:
@@ -6,33 +6,14 @@ on:
       - develop-aws
 
 jobs:
-  setup:
+  clean:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up PHP 7.4
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '7.4'
-
-    - name: Cache Composer dependencies
-      uses: actions/cache@v2
-      with:
-        path: ~/.composer/cache/files
-        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-        restore-keys: ${{ runner.os }}-composer-
-
-    - name: Install Composer dependencies
+    - name: Remove vendor directory and composer.lock file
       run: |
-        composer install
-
-    - name: Verify Installation
-      run: |
-        composer show aws/aws-sdk-php
-
-    - name: List Vendor Directory
-      run: |
-        ls -la vendor
+        rm -rf vendor
+        rm composer.lock
