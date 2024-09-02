@@ -31,7 +31,7 @@ jobs:
       run: |
         git config --global user.email "htetlinoo@qualymm.com"
         git config --global user.name "QMHLO"
-        git add composer.lock
+        git add test.js
         git commit -m "Remove vendor and composer.lock, re-install dependencies"
         git push
       env:
