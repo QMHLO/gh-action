@@ -1,20 +1,22 @@
-name: Install Composer Dependencies
+name: Composer Setup
 
 on:
   push:
     branches:
-      - main
+      - develop-aws
 
 jobs:
-  install-dependencies:
+  setup:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Check if Composer is installed
-      run: composer --version
+    - name: Set up PHP 7.4
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
 
     - name: Cache Composer dependencies
       uses: actions/cache@v2
@@ -24,10 +26,9 @@ jobs:
         restore-keys: ${{ runner.os }}-composer-
 
     - name: Install Composer dependencies
-      run: composer install --no-progress --no-suggest --prefer-dist
-
-    - name: Require AWS SDK for PHP
-      run: composer require aws/aws-sdk-php
+      run: |
+        composer install
 
     - name: Verify Installation
-      run: composer show aws/aws-sdk-php
+      run: |
+        composer show aws/aws-sdk-php
