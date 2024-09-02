@@ -35,4 +35,18 @@ jobs:
         git commit -m "Remove vendor and composer.lock, re-install dependencies"
         git push
       env:
-        GITHUB_TOKEN: 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
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+# Optional: If using a personal access token (PAT) instead of GITHUB_TOKEN
+# Ensure you add the PAT to GitHub Secrets with the name PERSONAL_ACCESS_TOKEN
+# and uncomment the following lines if you need to use it.
+
+#    - name: Commit and Push Changes
+#      run: |
+#        git config --global user.email "htetlinoo@qualymm.com"
+#        git config --global user.name "QMHLO"
+#        git add composer.lock
+#        git commit -m "Remove vendor and composer.lock, re-install dependencies"
+#        git push
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
