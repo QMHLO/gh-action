@@ -1,52 +1,28 @@
-name: Update Composer
+name: Add and Commit Test File
 
 on:
   push:
     branches:
-      - develop-aws
+      - develop-aws  # Change this to your target branch if different
 
 jobs:
-  update-composer:
+  add-commit-file:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Remove composer.lock and vendor directory
+    - name: Add test.js file
       run: |
-        rm -rf vendor composer.lock
-
-    - name: Install Composer
-      run: |
-        curl -sS https://getcomposer.org/installer | php
-        sudo mv composer.phar /usr/local/bin/composer
-
-    - name: Install Dependencies
-      run: |
-        composer config platform.php 7.4
-        composer install --ignore-platform-reqs
+        echo "console.log('Hello, World!');" > test.js
 
     - name: Commit and Push Changes
       run: |
         git config --global user.email "htetlinoo@qualymm.com"
         git config --global user.name "QMHLO"
         git add test.js
-        git commit -m "Remove vendor and composer.lock, re-install dependencies"
+        git commit -m "Add test.js file"
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-# Optional: If using a personal access token (PAT) instead of GITHUB_TOKEN
-# Ensure you add the PAT to GitHub Secrets with the name PERSONAL_ACCESS_TOKEN
-# and uncomment the following lines if you need to use it.
-
-#    - name: Commit and Push Changes
-#      run: |
-#        git config --global user.email "htetlinoo@qualymm.com"
-#        git config --global user.name "QMHLO"
-#        git add composer.lock
-#        git commit -m "Remove vendor and composer.lock, re-install dependencies"
-#        git push
-#      env:
-#        GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
