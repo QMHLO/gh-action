@@ -32,14 +32,30 @@ jobs:
         composer install --ignore-platform-reqs
         composer require aws/aws-sdk-php --ignore-platform-reqs
 
-    - name: List vendor directory
+    - name: List contents of vendor/composer directory
       run: |
-        cd vendor
-        ls -R
+        if [ -d "vendor/composer" ]; then
+          echo "Contents of vendor/composer:"
+          ls -l vendor/composer
+        else
+          echo "Directory vendor/composer does not exist."
+        fi
+
+    - name: Check if platform_check.php exists
+      run: |
+        if [ -f "vendor/composer/platform_check.php" ]; then
+          echo "platform_check.php exists."
+        else
+          echo "platform_check.php does not exist."
+        fi
 
     - name: Display platform_check.php file
       run: |
-        cat vendor/composer/platform_check.php
+        if [ -f "vendor/composer/platform_check.php" ]; then
+          cat vendor/composer/platform_check.php
+        else
+          echo "platform_check.php file is not available."
+        fi
 
     - name: Verify Installation
       run: |
