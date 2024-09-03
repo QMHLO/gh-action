@@ -28,14 +28,12 @@ jobs:
         ls -a
         echo "Listed files successfully"
 
-    - name: List vendor directory
+    - name: List vendor/composer directory
       run: |
-        ls -la vendor
-        echo "Displayed vendor directory successfully"
+        ls -la vendor/composer
+        echo "Displayed vendor/composer directory successfully"
 
     - name: Read composer.json
       run: |
         cat composer.json
         echo "Displayed composer.json successfully"
-
-    
