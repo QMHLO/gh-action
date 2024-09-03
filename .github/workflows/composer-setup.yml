@@ -1,28 +1,31 @@
-name: Add and Commit Test File
+name: Composer Setup and Lock Update
 
 on:
   push:
     branches:
-      - develop-aws  # Change this to your target branch if different
+      - develop-aws
 
 jobs:
-  add-commit-file:
+  setup:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Add test.js file
-      run: |
-        echo "console.log('Hello, World!');" > test.js
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'  # Adjust to match the PHP version on your server
 
-    - name: Commit and Push Changes
+    - name: Install Composer dependencies and update composer.lock
       run: |
-        git config --global user.email "htetlinoo@qualymm.com"
+        composer update --ignore-platform-reqs
+
+     - name: Commit composer.lock if updated
+      run: |
         git config --global user.name "QMHLO"
-        git add test.js
-        git commit -m "Add test.js file"
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        git config --global user.email "htetlinoo@qualymm.com"
+        git add composer.lock
+        git commit -m "Update composer.lock for PHP 7.4 compatibility" || echo "No changes to commit"
+        git push origin develop-aws
