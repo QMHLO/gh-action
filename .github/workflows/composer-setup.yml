@@ -28,6 +28,11 @@ jobs:
         ls -a
         echo "Listed files successfully"
 
+    - name: Read composer.json
+      run: |
+        cat composer.json
+        echo "Displayed composer.json successfully"
+
     - name: Check for changes in composer.lock
       run: |
         if git diff --name-only HEAD HEAD~1 | grep -q "composer.lock"; then
@@ -35,14 +40,3 @@ jobs:
         else
           echo "No changes in composer.lock"
         fi
-
-    - name: Commit composer.lock if updated
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: |
-        git config --global user.name "QMHLO"
-        git config --global user.email "htetlinoo@qualymm.com"
-        git add composer.lock
-        git commit -m "Update composer.lock for PHP 7.4 compatibility" || echo "No changes to commit"
-        git push https://github.com/QMHLO/gh-action.git HEAD:develop-aws
-        echo "Commit completed successfully"
