@@ -21,11 +21,26 @@ jobs:
     - name: Install Composer dependencies and update composer.lock
       run: |
         composer update --ignore-platform-reqs
+        echo "Composer update completed successfully"
 
-     - name: Commit composer.lock if updated
+    - name: List files in the directory
+      run: |
+        ls -a
+        echo "Listed files successfully"
+
+    - name: Check for changes in composer.lock
+      run: |
+        if git diff --name-only HEAD HEAD~1 | grep -q "composer.lock"; then
+          echo "composer.lock has been updated"
+        else
+          echo "No changes in composer.lock"
+        fi
+
+    - name: Commit composer.lock if updated
       run: |
         git config --global user.name "QMHLO"
         git config --global user.email "htetlinoo@qualymm.com"
         git add composer.lock
         git commit -m "Update composer.lock for PHP 7.4 compatibility" || echo "No changes to commit"
         git push origin develop-aws
+        echo "Commit completed successfully"
