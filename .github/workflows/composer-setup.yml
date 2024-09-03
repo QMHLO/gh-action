@@ -30,6 +30,12 @@ jobs:
     - name: Install Composer dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
 
+    - name: Show List
+      run: ls -la
+
+    - name: Show List .lock
+      run: cat composer.lock
+      
     - name: Require AWS SDK for PHP
       run: composer require aws/aws-sdk-php
 
