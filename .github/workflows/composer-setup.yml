@@ -1,39 +1,31 @@
-name: Composer Setup and Lock Update
+name: Install Packages
 
 on:
   push:
     branches:
       - develop-aws
+  pull_request:
+    branches:
+      - develop-aws
 
 jobs:
-  setup:
+  install:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-    - name: Set up PHP
+    - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '7.4'  # Adjust to match the PHP version on your server
+        php-version: '7.4'
+        extensions: mbstring, intl
+        ini-values: post_max_size=256M, upload_max_filesize=256M
 
-    - name: Install Composer dependencies and update composer.lock
-      run: |
-        composer update --ignore-platform-reqs
-        echo "Composer update completed successfully"
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
 
-    - name: List files in the directory
-      run: |
-        ls -a
-        echo "Listed files successfully"
+    - name: Require AWS SDK for PHP
+      run: composer require aws/aws-sdk-php
 
-    - name: List vendor/composer directory
-      run: |
-        ls -la vendor/aws
-        echo "Displayed vendor/aws directory successfully"
-
-    - name: Read composer.json
-      run: |
-        cat composer.json
-        echo "Displayed composer.json successfully"
