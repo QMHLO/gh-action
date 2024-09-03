@@ -1,0 +1,80 @@
+name: Deploy to Staging AWS EC2
+
+on:
+  push:
+    branches:
+      - develop-aws
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials from OIDC
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Prepare deployment package
+      run: |
+        tar -czf /tmp/deploy.tar.gz --exclude='.git' --exclude='.github' --exclude='node_modules' ./*
+        aws s3 cp /tmp/deploy.tar.gz s3://${{ secrets.STAGING_BUCKET_NAME }}/deploy.tar.gz
+
+    - name: Deploy to EC2 instances
+      run: |
+        EC2_INSTANCES=("i-0657f41151f5367c3")  # EC2インスタンスIDを適切に設定
+        for INSTANCE_ID in "${EC2_INSTANCES[@]}"
+        do
+          # インスタンスの状態を取得
+          STATE=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[*].Instances[*].State.Name" --output text)
+          
+          # インスタンスが停止している場合は起動
+          if [ "$STATE" == "stopped" ]; then
+            echo "Instance $INSTANCE_ID is stopped. Starting instance..."
+            aws ec2 start-instances --instance-ids $INSTANCE_ID
+            echo "Waiting for instance $INSTANCE_ID to start..."
+            aws ec2 wait instance-running --instance-ids $INSTANCE_ID
+            echo "Instance $INSTANCE_ID is now running."
+          else
+            echo "Instance $INSTANCE_ID is already in state: $STATE"
+          fi
+
+          # SSM エージェントがオンラインになるのを待機
+          echo "Waiting for instance $INSTANCE_ID to be ready for SSM commands..."
+          while true; do
+            SSM_STATUS=$(aws ssm describe-instance-information --filters "Key=InstanceIds,Values=$INSTANCE_ID" --query "InstanceInformationList[*].PingStatus" --output text)
+            if [ "$SSM_STATUS" == "Online" ]; then
+              echo "Instance $INSTANCE_ID is ready for SSM commands."
+              break
+            else
+              echo "Instance $INSTANCE_ID is not ready yet. Waiting..."
+              sleep 10  # 10秒待機してから再度チェック
+            fi
+          done
+
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --instance-ids "$INSTANCE_ID" \
+            --parameters commands='[
+              "aws s3 cp s3://${{ secrets.STAGING_BUCKET_NAME }}/deploy.tar.gz /tmp/deploy.tar.gz",
+              "sudo mkdir -p /var/www/html",
+              "sudo tar -xzf /tmp/deploy.tar.gz -C /var/www/html",
+              "sudo chown -R apache:apache /var/www/html/",
+              "sudo chmod -R 755 /var/www/html/",
+              "sudo find /var/www/html -type d -exec chmod 775 {} \\;",
+              "sudo find /var/www/html -type f -exec chmod 664 {} \\;",
+              "sudo usermod -a -G apache ec2-user",
+              "sudo chmod g+s /var/www/html",
+              "echo \"${{ secrets.ENV_AWS_STAGING }}\" | sudo tee /var/www/html/.env > /dev/null",
+              "sudo systemctl restart httpd"
+            ]' \
+            --output text
+        done

@@ -1,0 +1,21 @@
+name: Deploy to FTP server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Deploy to Staging FTP server
+      uses: SamKirkland/FTP-Deploy-Action@4.0.0
+      with:
+        server: ${{ secrets.RAKHUB_SERVER }}
+        username: ${{ secrets.RAKHUB_USER }}
+        password: ${{ secrets.RAKHUB_PASS }}
