@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - develop-aws
-  pull_request:
-    branches:
-      - develop-aws
 
 jobs:
   install:
@@ -23,9 +20,18 @@ jobs:
         extensions: mbstring, intl
         ini-values: post_max_size=256M, upload_max_filesize=256M
 
+    - name: Cache Composer dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.composer/cache/files
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-
+
     - name: Install Composer dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
 
     - name: Require AWS SDK for PHP
       run: composer require aws/aws-sdk-php
 
+    - name: Display vendor directory contents
+      run: ls -la vendor/composer
