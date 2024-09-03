@@ -35,3 +35,7 @@ jobs:
 
     - name: Display vendor directory contents
       run: ls -la vendor/composer
+
+    - name: Display platform_check
+      run: cat vendor/composer/platform_check.php
+    
