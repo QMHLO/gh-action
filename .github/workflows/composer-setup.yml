@@ -28,15 +28,14 @@ jobs:
         ls -a
         echo "Listed files successfully"
 
+    - name: List vendor directory
+      run: |
+        ls -la vendor
+        echo "Displayed vendor directory successfully"
+
     - name: Read composer.json
       run: |
         cat composer.json
         echo "Displayed composer.json successfully"
 
-    - name: Check for changes in composer.lock
-      run: |
-        if git diff --name-only HEAD HEAD~1 | grep -q "composer.lock"; then
-          echo "composer.lock has been updated"
-        else
-          echo "No changes in composer.lock"
-        fi
+    
