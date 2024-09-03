@@ -30,8 +30,8 @@ jobs:
 
     - name: List vendor/composer directory
       run: |
-        ls -la vendor/composer
-        echo "Displayed vendor/composer directory successfully"
+        ls -la vendor/aws
+        echo "Displayed vendor/aws directory successfully"
 
     - name: Read composer.json
       run: |
