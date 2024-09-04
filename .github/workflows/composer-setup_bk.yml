@@ -1,0 +1,63 @@
+name: Install Packages
+
+on:
+  push:
+    branches:
+      - develop-aws
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout code
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Setup PHP 7.4
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+        extensions: mbstring, intl
+        ini-values: post_max_size=256M, upload_max_filesize=256M
+
+    # Step 3: Clear Composer cache to avoid cached issues
+    - name: Clear Composer Cache
+      run: composer clear-cache
+
+    # Step 4: Cache Composer dependencies
+    - name: Cache Composer dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.composer/cache/files
+        key: ${{ runner.os }}-composer-clearcache-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-
+
+    # Step 5: Install Composer dependencies and ignore platform requirements (to bypass PHP version checks)
+    - name: Install Composer dependencies (Ignore platform requirements)
+      run: composer install --prefer-dist --no-progress --no-suggest --ignore-platform-reqs
+
+    # Step 6: Check which package is causing PHP version requirement to be 8.1
+    - name: Find out why PHP 8.1 is required
+      run: composer why php
+
+    # Step 7: Show list of files in the working directory for debugging
+    - name: Show List
+      run: ls -la
+
+    # Step 8: Show content of composer.lock for debugging
+    - name: Show List .lock
+      run: cat composer.lock
+      
+    # Step 9: Require AWS SDK for PHP (optional, if needed again)
+    - name: Require AWS SDK for PHP
+      run: composer require aws/aws-sdk-php
+
+    # Step 10: Display vendor directory contents for debugging
+    - name: Display vendor directory contents
+      run: ls -la vendor/composer
+
+    # Step 11: Display platform check file for debugging (this file may enforce PHP version checks)
+    - name: Display platform_check.php
+      run: cat vendor/composer/platform_check.php
