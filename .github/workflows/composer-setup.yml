@@ -16,9 +16,8 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '7.4'
+        php-version: '8.1'
         extensions: mbstring, intl
-        ini-values: post_max_size=256M, upload_max_filesize=256M
 
     - name: Clear Composer Cache
       run: composer clear-cache
@@ -38,17 +37,11 @@ jobs:
     - name: Install Composer dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
 
-    - name: Find out why PHP 8.1 is required
-      run: composer why php
+    - name: Require AWS SDK for PHP
+      run: composer require aws/aws-sdk-php
 
-    - name: Show List
+    - name: Dump Autoload
+      run: composer dump-autoload
+
+    - name: Show List File
       run: ls -la
-
-    - name: Show List .lock
-      run: cat composer.lock
-
-    - name: Display vendor directory contents
-      run: ls -la vendor/composer
-
-    - name: Display platform_check.php
-      run: cat vendor/composer/platform_check.php
