@@ -1,7 +1,9 @@
 {
   "require": {
     "php": "^7.4",
-    "aws/aws-sdk-php": "^3.321"
+    "aws/aws-sdk-php": "^3.321",
+    "symfony/deprecation-contracts": "^2.5",
+    "symfony/polyfill-mbstring": "^1.30"
   },
   "config": {
     "platform": {

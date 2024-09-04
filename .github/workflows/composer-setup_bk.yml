@@ -61,3 +61,7 @@ jobs:
     # Step 11: Display platform check file for debugging (this file may enforce PHP version checks)
     - name: Display platform_check.php
       run: cat vendor/composer/platform_check.php
+
+   # Step 9: Ensure platform is set to PHP 7.4
+    - name: Install Composer dependencies with platform check (ensure PHP 7.4)
+      run: composer install --prefer-dist --no-progress --no-suggest --ignore-platform-reqs

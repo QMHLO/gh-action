@@ -10,11 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Checkout code
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # Step 2: Setup PHP 7.4
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
@@ -22,34 +20,35 @@ jobs:
         extensions: mbstring, intl
         ini-values: post_max_size=256M, upload_max_filesize=256M
 
-    # Step 3: Clear Composer Cache
     - name: Clear Composer Cache
       run: composer clear-cache
 
-    # Step 4: Cache Composer dependencies
     - name: Cache Composer dependencies
       uses: actions/cache@v2
       with:
         path: ~/.composer/cache/files
-        key: ${{ runner.os }}-composer-clearcache-${{ hashFiles('**/composer.lock') }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
         restore-keys: ${{ runner.os }}-composer-
 
-    # Step 5: Update Composer dependencies while ignoring platform requirements (temporarily)
-    - name: Update Composer dependencies (Ignore platform requirements temporarily)
-      run: composer update --ignore-platform-reqs
+    - name: Remove vendor and composer.lock
+      run: |
+        rm -rf vendor
+        rm -f composer.lock
 
-    # Step 6: Show the list of files to verify directory structure
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+
+    - name: Find out why PHP 8.1 is required
+      run: composer why php
+
     - name: Show List
       run: ls -la
 
-    # Step 7: Display the composer.lock file to check which packages are locked
     - name: Show List .lock
       run: cat composer.lock
 
-    # Step 8: Display platform_check.php file to see if any PHP 8.1 requirement is being enforced
+    - name: Display vendor directory contents
+      run: ls -la vendor/composer
+
     - name: Display platform_check.php
       run: cat vendor/composer/platform_check.php
-
-    # Step 9: Ensure platform is set to PHP 7.4
-    - name: Install Composer dependencies with platform check (ensure PHP 7.4)
-      run: composer install --prefer-dist --no-progress --no-suggest --ignore-platform-reqs
